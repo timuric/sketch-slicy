@@ -4,6 +4,7 @@ var assetsFolder = undefined;
 var layerNames = [];
 var uniqueNames = [];
 layers = doc.currentPage().layers();
+var nameCount = 0;
 
 function exportLayer(layer,path,scale){  
   var rect = [layer rectByAccountingForStyleSize:[[layer absoluteRect] rect]];
@@ -12,8 +13,7 @@ function exportLayer(layer,path,scale){
 }
 
 function exportWithOptions(layer,path,extension,scale){  
-  scaleValue = scale && scale.length ? scale[0].match(/\d/)[0] : 1;
-  extension
+  scaleValue = scale && scale.length ? scale[0].match(/\d/)[0] : 1;  
   if(scale && scale[0].match(/\+/)){ 
     var export_data = [{
       "format": extension.replace(".",""),
@@ -31,9 +31,7 @@ function exportWithOptions(layer,path,extension,scale){
       "scale": scaleValue,
       "suffix": ""
     }];
-  }  
-  log(export_data)
-  path = path+extension;
+  }    
   var export_options = [layer exportOptions];
   var export_sizes = [export_options sizes];
 
@@ -53,8 +51,14 @@ function exportWithOptions(layer,path,extension,scale){
   [layer select:true byExpandingSelection:true]
 
   var rect = [layer rectByAccountingForStyleSize:[[layer absoluteRect] rect]];
-  var slice = [[MSSliceMaker slicesFromExportableLayer:layer inRect:rect] firstObject];  
-  [doc saveArtboardOrSlice: slice toFile: path];
+  var slices = [MSSliceMaker slicesFromExportableLayer:layer inRect:rect];  
+  eachArray(slices,function(slice,i){        
+    var layerName = path;
+    layerName += export_data[i].scale > 1 ? "@"+export_data[i].scale : "";
+    layerName += extension;        
+    log(layerName)
+    [doc saveArtboardOrSlice: slice toFile: layerName];
+  })  
 }
 function eachArray(list,callback){
   for(var i=0, l = [list count]; i<l; i++){
@@ -77,27 +81,32 @@ function main(){
   //Create unique names
   eachArray(layers,function(layer){
     var match = 0;
-    var layerName = layer.name().replace(/\..+$/,"");
-    layerName = layerName.replace(" ","-");
-    layerNames.push(layerName);  
-    layerNames.forEach(function(existingName){
-      if(layerName === existingName){
-        match += 1;
-      }
-    })
-    match > 0 ? uniqueNames.push(layerName+"-"+match) :  uniqueNames.push(layerName);
-  })
-
-  eachArray(layers,function(layer,i){  
     var layerName = layer.name();
     var options = layerName.match(/\..+$/);
     if(options){
+      var layerName = layer.name().replace(/\..+$/,"");
+      layerName = layerName.replace(" ","-");
+      layerNames.push(layerName);  
+      layerNames.forEach(function(existingName){
+        if(layerName === existingName){
+          match += 1;
+        }
+      })
+      match > 0 ? uniqueNames.push(layerName+"-"+match) :  uniqueNames.push(layerName);
+    }    
+  })
+
+  eachArray(layers,function(layer){  
+    var layerName = layer.name();
+    var options = layerName.match(/\..+$/);
+    if(options){      
       var extension = options[0].match(/\.\w+/)[0];
       var scale = options[0].match(/[\+\-@].+/);
-      if(layer.isVisible() === 1){
-        var path = assetsFolder + uniqueNames[i];
+      if(layer.isVisible() === 1){        
+        var path = assetsFolder + uniqueNames[nameCount];        
         exportWithOptions(layer, path, extension, scale)
       }
+      nameCount++;
     }
   });
 
