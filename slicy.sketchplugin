@@ -1,0 +1,22 @@
+var artboards = [[doc currentPage] artboards];
+var sketchDoc = sketch.doc.fileURL().path();
+layers = doc.currentPage().layers()
+
+function exportLayer(layer,path){
+  var rect = [layer rectByAccountingForStyleSize:[[layer absoluteRect] rect]];
+  var slice = [[MSSliceMaker slicesFromExportableLayer:layer inRect:rect] firstObject];
+  var imageData = [MSSliceExporter dataForRequest:slice];
+  [doc saveArtboardOrSlice: slice toFile: path];
+}
+function eachArray(list,callback){
+  for(var i=0, l = [list count]; i<l; i++){
+    callback(list.objectAtIndex(i),i);
+  }
+}
+eachArray(layers,function(layer){
+	var layerName = layer.name();
+	if(layerName.substr(layerName.length() - 4) === ".png" || layerName.substr(layerName.length() - 4) === ".jpg"){
+    var path = sketchDoc.replace(".sketch","") + ".assets/" + layerName;
+		exportLayer(layer, path)
+	}
+})
