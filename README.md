@@ -17,3 +17,7 @@ Requires [Sketch Beta](http://bohemiancoding.com/sketch/beta/)
 * Add desired format to the layer or group name to generate an asset, for example: `icon.png`
 * `icon.png+@2` - Would generate original asset plus retina version that would be named `icon@2.png`
 * `icon.png@2` - Would generate only one asset (which would be double the size)
+
+Follow [me on twitter](https://twitter.com/timur_carpeev) for future updates. Or you can try out this [plugin manager](https://github.com/shahruz/Sketch-Toolbox) (it is in very early stage though).
+
+Special thanks to Ale and Sam Deane for help.
