@@ -1,5 +1,6 @@
 var artboards = [[doc currentPage] artboards];
 var sketchDoc = sketch.doc.fileURL().path();
+var assetsFolder = sketchDoc.replace(".sketch","") + ".assets/";
 var layerNames = [];
 var uniqueNames = [];
 layers = doc.currentPage().layers();
@@ -15,6 +16,9 @@ function eachArray(list,callback){
     callback(list.objectAtIndex(i),i);
   }
 }
+
+//
+[[NSFileManager defaultManager] removeItemAtPath:assetsFolder error:nil];
 
 //Create unique names
 eachArray(layers,function(layer){
@@ -33,8 +37,8 @@ eachArray(layers,function(layer){
 eachArray(layers,function(layer,i){  
 	var layerName = layer.name();
   var extension = layerName.substr(layerName.length() - 4)
-	if(extension === ".png" || extension === ".jpg"){
-    var path = sketchDoc.replace(".sketch","") + ".assets/" + uniqueNames[i] + extension;    
+	if( (extension.match(/\.png/) || extension.match(/\.jpg/)) && layer.isVisible() === 1){
+    var path = assetsFolder + uniqueNames[i] + extension;    
 		exportLayer(layer, path)
 	}
 });
