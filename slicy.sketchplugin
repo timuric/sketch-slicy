@@ -5,8 +5,53 @@ var layerNames = [];
 var uniqueNames = [];
 layers = doc.currentPage().layers();
 
+function exportLayer(layer,path,scale){  
+  var rect = [layer rectByAccountingForStyleSize:[[layer absoluteRect] rect]];
+  var slice = [[MSSliceMaker slicesFromExportableLayer:layer inRect:rect] firstObject];  
+  [doc saveArtboardOrSlice: slice toFile: path];
+}
 
-function exportLayer(layer,path){
+function exportWithOptions(layer,path,extension,scale){  
+  scaleValue = scale && scale.length ? scale[0].match(/\d/)[0] : 1;
+  extension
+  if(scale && scale[0].match(/\+/)){ 
+    var export_data = [{
+      "format": extension.replace(".",""),
+      "scale": 1,
+      "suffix": ""
+    },{
+      "format": extension.replace(".",""),
+      "scale": scaleValue,
+      "suffix": ""
+    }];
+  }
+  else{
+    var export_data = [{
+      "format": extension.replace(".",""),
+      "scale": scaleValue,
+      "suffix": ""
+    }];
+  }  
+  log(export_data)
+  path = path+extension;
+  var export_options = [layer exportOptions];
+  var export_sizes = [export_options sizes];
+
+  // Clear all exportable sizes
+  while([export_sizes count] > 0) {
+    [[export_sizes firstObject] remove]
+  }
+  for (var s = 0; s < export_data.length; s++) {
+    var size_data = export_data[s]
+    var size = [[layer exportOptions] addExportSize]
+    [size setFormat:size_data.format]
+    [size setScale:size_data.scale]
+    [size setName:size_data.suffix]
+  }
+  // This is just a hack to force the updating of the UI to see the new sizes in the inspector
+  [[doc currentPage] deselectAllLayers]
+  [layer select:true byExpandingSelection:true]
+
   var rect = [layer rectByAccountingForStyleSize:[[layer absoluteRect] rect]];
   var slice = [[MSSliceMaker slicesFromExportableLayer:layer inRect:rect] firstObject];  
   [doc saveArtboardOrSlice: slice toFile: path];
@@ -45,10 +90,14 @@ function main(){
 
   eachArray(layers,function(layer,i){  
     var layerName = layer.name();
-    var extension = layerName.substr(layerName.length() - 4)
-    if( (extension.match(/\.png/) || extension.match(/\.jpg/)) && layer.isVisible() === 1){
-      var path = assetsFolder + uniqueNames[i] + extension;    
-      exportLayer(layer, path)
+    var options = layerName.match(/\..+$/);
+    if(options){
+      var extension = options[0].match(/\.\w+/)[0];
+      var scale = options[0].match(/[\+\-@].+/);
+      if(layer.isVisible() === 1){
+        var path = assetsFolder + uniqueNames[i];
+        exportWithOptions(layer, path, extension, scale)
+      }
     }
   });
 
