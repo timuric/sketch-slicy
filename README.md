@@ -13,7 +13,7 @@ Requires [Sketch Beta](http://bohemiancoding.com/sketch/beta/)
 * Assets clean up (Deleted layers/sizes from document automatically being removed from assets folder)
 * it is free
 
-###Usage:
-* Add extension to the layer or group name to generate an asset, like so `icon.png`
+###Tutorial:
+* Add desired format to the layer or group name to generate an asset, for example: `icon.png`
 * `icon.png+@2` - Would generate original asset plus retina version that would be named `icon@2.png`
 * `icon.png@2` - Would generate only one asset (which would be double the size)
