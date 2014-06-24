@@ -1,11 +1,13 @@
 var artboards = [[doc currentPage] artboards];
 var sketchDoc = sketch.doc.fileURL().path();
-layers = doc.currentPage().layers()
+var layerNames = [];
+var uniqueNames = [];
+layers = doc.currentPage().layers();
+
 
 function exportLayer(layer,path){
   var rect = [layer rectByAccountingForStyleSize:[[layer absoluteRect] rect]];
-  var slice = [[MSSliceMaker slicesFromExportableLayer:layer inRect:rect] firstObject];
-  var imageData = [MSSliceExporter dataForRequest:slice];
+  var slice = [[MSSliceMaker slicesFromExportableLayer:layer inRect:rect] firstObject];  
   [doc saveArtboardOrSlice: slice toFile: path];
 }
 function eachArray(list,callback){
@@ -13,10 +15,26 @@ function eachArray(list,callback){
     callback(list.objectAtIndex(i),i);
   }
 }
+
+//Create unique names
 eachArray(layers,function(layer){
+  var match = 0;
+  var layerName = layer.name().replace(/\..+$/,"");
+  layerName = layerName.replace(" ","-");
+  layerNames.push(layerName);  
+  layerNames.forEach(function(existingName){
+    if(layerName === existingName){
+      match += 1;
+    }
+  })
+  match > 0 ? uniqueNames.push(layerName+"-"+match) :  uniqueNames.push(layerName);
+})
+
+eachArray(layers,function(layer,i){  
 	var layerName = layer.name();
-	if(layerName.substr(layerName.length() - 4) === ".png" || layerName.substr(layerName.length() - 4) === ".jpg"){
-    var path = sketchDoc.replace(".sketch","") + ".assets/" + layerName;
+  var extension = layerName.substr(layerName.length() - 4)
+	if(extension === ".png" || extension === ".jpg"){
+    var path = sketchDoc.replace(".sketch","") + ".assets/" + uniqueNames[i] + extension;    
 		exportLayer(layer, path)
 	}
-})
+});
