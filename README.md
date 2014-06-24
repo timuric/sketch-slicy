@@ -1,4 +1,6 @@
 sketch-slicy
 ============
 
-Export groups and layers by naming layers
+Sketch app plugin inspired by [Slicy](http://macrabbit.com/slicy/) app.
+
+Requires [Sketch Beta](http://bohemiancoding.com/sketch/beta/)
