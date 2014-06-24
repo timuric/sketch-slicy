@@ -6,12 +6,6 @@ var uniqueNames = [];
 layers = doc.currentPage().layers();
 var nameCount = 0;
 
-function exportLayer(layer,path,scale){  
-  var rect = [layer rectByAccountingForStyleSize:[[layer absoluteRect] rect]];
-  var slice = [[MSSliceMaker slicesFromExportableLayer:layer inRect:rect] firstObject];  
-  [doc saveArtboardOrSlice: slice toFile: path];
-}
-
 function exportWithOptions(layer,path,extension,scale){  
   scaleValue = scale && scale.length ? scale[0].match(/\d/)[0] : 1;  
   if(scale && scale[0].match(/\+/)){ 
@@ -77,7 +71,17 @@ function main(){
   }  
   //Delete folder
   [[NSFileManager defaultManager] removeItemAtPath:assetsFolder error:nil];
-
+function loopThroughLayers(layers,func){
+  if([layers firstObject].class() === MSArtboardGroup){
+    eachArray(layers,function(art){
+      var layers = art.layers()
+      eachArray(layers,func)
+    });
+  }
+  else{
+    eachArray(layers,func);
+  }
+}
   //Create unique names
   eachArray(layers,function(layer){
     var match = 0;
