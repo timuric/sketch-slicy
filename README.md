@@ -20,4 +20,4 @@ Requires [Sketch Beta](http://bohemiancoding.com/sketch/beta/)
 
 Follow [me on twitter](https://twitter.com/timur_carpeev) for future updates. Or you can try out this [plugin manager](https://github.com/shahruz/Sketch-Toolbox) (it is in very early stage though).
 
-Special thanks to Ale and Sam Deane for help.
+Special thanks to Ale Muñoz and Sam Deane for help.
