@@ -71,42 +71,47 @@ function main(){
   }  
   //Delete folder
   [[NSFileManager defaultManager] removeItemAtPath:assetsFolder error:nil];
-function loopThroughLayers(layers,func){
+
+function eachLayer(layers,func){
   if([layers firstObject].class() === MSArtboardGroup){
     eachArray(layers,function(art){
-      var layers = art.layers()
+      var layers = art.children()
       eachArray(layers,func)
     });
   }
   else{
-    eachArray(layers,func);
+    eachArray(layers,func)
   }
 }
   //Create unique names
-  eachArray(layers,function(layer){
+  eachLayer(layers,function(layer){
     var match = 0;
     var layerName = layer.name();
-    var options = layerName.match(/\..+$/);
-    if(options){
-      var layerName = layer.name().replace(/\..+$/,"");
-      layerName = layerName.replace(" ","-");
-      layerNames.push(layerName);  
+    log(layerName)
+    var isExportable = layerName.match(/\..+$/);
+    if(isExportable){
+      layerName = layer.name().replace(/\..+$/,"");      
+      layerName = layerName.replace(" ","-");      
       layerNames.forEach(function(existingName){
         if(layerName === existingName){
           match += 1;
         }
       })
+      layerNames.push(layerName);
+      log(match)
       match > 0 ? uniqueNames.push(layerName+"-"+match) :  uniqueNames.push(layerName);
     }    
   })
 
-  eachArray(layers,function(layer){  
+  log(uniqueNames)
+
+  eachLayer(layers,function(layer){  
     var layerName = layer.name();
     var options = layerName.match(/\..+$/);
     if(options){      
       var extension = options[0].match(/\.\w+/)[0];
       var scale = options[0].match(/[\+\-@].+/);
-      if(layer.isVisible() === 1){        
+      if(layer.isVisible() === 1){
         var path = assetsFolder + uniqueNames[nameCount];        
         exportWithOptions(layer, path, extension, scale)
       }
@@ -115,5 +120,6 @@ function loopThroughLayers(layers,func){
   });
 
 }
+
 main()
 
