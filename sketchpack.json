@@ -1,5 +1,5 @@
 {
     "name": "Sketch slicy",
-    "description": "A nice long description of your plugin. Go as wild as you want",
+    "description": "Export assets by seting layer names.",
     "tags": ["export", "slices", "batch", "slicy","exporting","assets"]
 }
