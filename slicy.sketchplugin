@@ -1,6 +1,6 @@
 var artboards = [[doc currentPage] artboards];
-var sketchDoc = sketch.doc.fileURL().path();
-var assetsFolder = sketchDoc.replace(".sketch","") + ".assets/";
+var sketchDoc = undefined;
+var assetsFolder = undefined;
 var layerNames = [];
 var uniqueNames = [];
 layers = doc.currentPage().layers();
@@ -17,28 +17,41 @@ function eachArray(list,callback){
   }
 }
 
-//
-[[NSFileManager defaultManager] removeItemAtPath:assetsFolder error:nil];
+function main(){
+  if(sketch.doc.fileURL()){
+    sketchDoc = sketch.doc.fileURL().path();
+    assetsFolder = sketchDoc.replace(".sketch","") + ".assets/";
+  }
+  else{
+    [doc showMessage:"Save your work before exporting"]
+    return 0;
+  }  
+  //Delete folder
+  [[NSFileManager defaultManager] removeItemAtPath:assetsFolder error:nil];
 
-//Create unique names
-eachArray(layers,function(layer){
-  var match = 0;
-  var layerName = layer.name().replace(/\..+$/,"");
-  layerName = layerName.replace(" ","-");
-  layerNames.push(layerName);  
-  layerNames.forEach(function(existingName){
-    if(layerName === existingName){
-      match += 1;
-    }
+  //Create unique names
+  eachArray(layers,function(layer){
+    var match = 0;
+    var layerName = layer.name().replace(/\..+$/,"");
+    layerName = layerName.replace(" ","-");
+    layerNames.push(layerName);  
+    layerNames.forEach(function(existingName){
+      if(layerName === existingName){
+        match += 1;
+      }
+    })
+    match > 0 ? uniqueNames.push(layerName+"-"+match) :  uniqueNames.push(layerName);
   })
-  match > 0 ? uniqueNames.push(layerName+"-"+match) :  uniqueNames.push(layerName);
-})
 
-eachArray(layers,function(layer,i){  
-	var layerName = layer.name();
-  var extension = layerName.substr(layerName.length() - 4)
-	if( (extension.match(/\.png/) || extension.match(/\.jpg/)) && layer.isVisible() === 1){
-    var path = assetsFolder + uniqueNames[i] + extension;    
-		exportLayer(layer, path)
-	}
-});
+  eachArray(layers,function(layer,i){  
+    var layerName = layer.name();
+    var extension = layerName.substr(layerName.length() - 4)
+    if( (extension.match(/\.png/) || extension.match(/\.jpg/)) && layer.isVisible() === 1){
+      var path = assetsFolder + uniqueNames[i] + extension;    
+      exportLayer(layer, path)
+    }
+  });
+
+}
+main()
+
