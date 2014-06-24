@@ -5,6 +5,8 @@ Sketch app plugin inspired by [Slicy](http://macrabbit.com/slicy/) app.
 
 Requires [Sketch Beta](http://bohemiancoding.com/sketch/beta/)
 
+![screenshot](https://raw.githubusercontent.com/timuric/sketch-slicy/master/README/screenshot.png)
+
 ###Features:
 * Web friendly assets names
 * Exports layers with similar names
