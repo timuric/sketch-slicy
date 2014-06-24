@@ -7,7 +7,9 @@ Requires [Sketch Beta](http://bohemiancoding.com/sketch/beta/)
 
 ###Features:
 * Web friendly assets names
+* Exports layers with similar names
 * Assets clean up (Deleted layers/sizes from document automatically being removed from assets folder)
+* it is free
 
 ###Usage:
 * Add extension to the layer or group name to generate an asset, like so `icon.png`
