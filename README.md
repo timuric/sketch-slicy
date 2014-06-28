@@ -8,7 +8,7 @@ Requires [Sketch Beta](http://bohemiancoding.com/sketch/beta/)
 ![screenshot](https://raw.githubusercontent.com/timuric/sketch-slicy/master/README/screenshot.png)
 
 ###Features:
-* Web friendly assets names (no white spaces and lower case letters)
+* Web friendly assets names (lower case letters and whitespace trim)
 * Exports layers with similar names
 * Assets clean up (Deleted layers/sizes from document automatically being removed from assets folder)
 * it is free
