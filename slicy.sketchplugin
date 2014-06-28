@@ -6,9 +6,9 @@ var uniqueNames = [];
 layers = doc.currentPage().layers();
 var nameCount = 0;
 
-function exportWithOptions(layer,path,extension,scale){  
-  scaleValue = scale && scale.length ? scale[0].match(/\d/)[0] : 1;  
-  if(scale && scale[0].match(/\+/)){ 
+function exportWithOptions(layer,path,extension,scale){
+  scaleValue = scale && scale.length ? scale[0].match(/\d/)[0] : 1;
+  if(scale && scale[0].match(/\+/)){
     var export_data = [{
       "format": extension.replace(".",""),
       "scale": 1,
@@ -25,7 +25,7 @@ function exportWithOptions(layer,path,extension,scale){
       "scale": scaleValue,
       "suffix": ""
     }];
-  }    
+  }
   var export_options = [layer exportOptions];
   var export_sizes = [export_options sizes];
 
@@ -45,33 +45,20 @@ function exportWithOptions(layer,path,extension,scale){
   [layer select:true byExpandingSelection:true]
 
   var rect = [layer rectByAccountingForStyleSize:[[layer absoluteRect] rect]];
-  var slices = [MSSliceMaker slicesFromExportableLayer:layer inRect:rect];  
-  eachArray(slices,function(slice,i){        
+  log(rect)
+  var slices = [MSSliceMaker slicesFromExportableLayer:layer inRect:rect];
+  eachArray(slices,function(slice,i){
     var layerName = path;
     layerName += export_data[i].scale > 1 ? "@"+export_data[i].scale : "";
-    layerName += extension;        
-    log(layerName)
+    layerName += extension;
     [doc saveArtboardOrSlice: slice toFile: layerName];
-  })  
+  })
 }
 function eachArray(list,callback){
   for(var i=0, l = [list count]; i<l; i++){
     callback(list.objectAtIndex(i),i);
   }
 }
-
-function main(){
-  if(sketch.doc.fileURL()){
-    sketchDoc = sketch.doc.fileURL().path();
-    assetsFolder = sketchDoc.replace(".sketch","") + ".assets/";
-  }
-  else{
-    [doc showMessage:"Save your work before exporting"]
-    return 0;
-  }  
-  //Delete folder
-  [[NSFileManager defaultManager] removeItemAtPath:assetsFolder error:nil];
-
 function eachLayer(layers,func){
   if([layers firstObject].class() === MSArtboardGroup){
     eachArray(layers,function(art){
@@ -83,42 +70,53 @@ function eachLayer(layers,func){
     eachArray(layers,func)
   }
 }
+
+function main(){
+  if(sketch.doc.fileURL()){
+    sketchDoc = sketch.doc.fileURL().path();
+    assetsFolder = sketchDoc.replace(".sketch","") + ".assets/";
+  }
+  else{
+    [doc showMessage:"Save your work before exporting"]
+    return 0;
+  }
+  //Delete folder
+  [[NSFileManager defaultManager] removeItemAtPath:assetsFolder error:nil];
+
   //Create unique names
   eachLayer(layers,function(layer){
     var match = 0;
     var layerName = layer.name();
-    log(layerName)
     var isExportable = layerName.match(/\..+$/);
     if(isExportable){
-      layerName = layer.name().replace(/\..+$/,"");      
-      layerName = layerName.replace(" ","-");      
+      layerName = layer.name().replace(/\..+$/,"");
+      layerName = layerName.replace(" ","-");
+      layerName = layerName.toLowerCase();
       layerNames.forEach(function(existingName){
         if(layerName === existingName){
           match += 1;
         }
       })
       layerNames.push(layerName);
-      log(match)
       match > 0 ? uniqueNames.push(layerName+"-"+match) :  uniqueNames.push(layerName);
-    }    
+    }
   })
 
-  log(uniqueNames)
-
-  eachLayer(layers,function(layer){  
+  eachLayer(layers,function(layer){
     var layerName = layer.name();
     var options = layerName.match(/\..+$/);
-    if(options){      
+    if(options){
       var extension = options[0].match(/\.\w+/)[0];
       var scale = options[0].match(/[\+\-@].+/);
       if(layer.isVisible() === 1){
-        var path = assetsFolder + uniqueNames[nameCount];        
+        var path = assetsFolder + uniqueNames[nameCount];
         exportWithOptions(layer, path, extension, scale)
       }
       nameCount++;
     }
   });
-
+  var doneMessage = "Exported " + layerNames.length + " elements";
+  [doc showMessage:doneMessage ]
 }
 
 main()
